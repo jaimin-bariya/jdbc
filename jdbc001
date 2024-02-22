@@ -1,0 +1,157 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.*;
+import java.util.Scanner;
+
+
+//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
+// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+public class Main {
+
+
+    public static void printRows(ResultSet resultSet) throws SQLException {
+        while (resultSet.next()){
+            System.out.println(resultSet.getInt(1) + " " + resultSet.getString(2) + " " +
+                    resultSet.getInt(3));
+        }
+    }
+
+
+
+    public static void insertRecords(Connection con1){
+
+
+
+        Scanner scan01 = new Scanner(System.in);
+        System.out.println(("Enter Student ID here : "));
+        int studentID = scan01.nextInt();
+        scan01.nextLine();
+
+        System.out.println("Enter name of Student : ");
+        String studentName = scan01.nextLine();
+
+        System.out.println("Enter age of Student : ");
+        int studentAge = scan01.nextInt();
+        scan01.nextLine();
+
+
+
+        try {
+
+            String insertQuery = "insert into STUDENT VALUES (?, ?, ?)";
+
+            PreparedStatement preparedStatement = con1.prepareStatement(insertQuery);
+
+            preparedStatement.setInt(1, studentID);
+            preparedStatement.setString(2, studentName);
+            preparedStatement.setInt(3, studentAge);
+
+
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected > 0){
+                System.out.println("Data inserted Successfully");
+            }
+            else {
+                System.out.println("Failed to insert data");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    public static void main(String[] args) {
+
+        String jdbcUrl = "jdbc:oracle:thin:@localhost:1521:XE";
+
+        // Database credentials
+        String tableName = "STUDENT";
+        String username = "system";
+        String password = "123";
+
+
+
+
+
+        try {
+
+            // step - 1: register the driver / load the driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Connection con1 = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/?user=root/JDB001","root","1234");
+
+            //PreparedStatement preparedStmt = connection.prepareStatement("SELECT * FROM STUDENT WHERE id = ?");
+            Statement statement = con1.createStatement();
+            Statement statement0 = con1.createStatement();
+
+
+
+            statement0.execute("use JDB001");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM STUDENT");
+
+
+
+
+            System.out.println("What do you want to do? Choose one option");
+            System.out.println("1. Print all the rows from STUDENT table");
+            System.out.println("2. Insert records in STUDENT table");
+            System.out.println("3. Get Metadata");
+
+
+
+            Scanner scan01 = new Scanner(System.in);
+            System.out.println("Enter 1/2/3 : ");
+            int choice = scan01.nextInt();
+
+
+
+            switch (choice){
+                case 1:
+                    printRows(resultSet);
+                    break;
+
+                case 2:
+                    insertRecords(con1);
+                    break;
+
+//                case 3:
+//                    getMetaData();
+//                    break;
+
+                default:
+                    System.out.println("Enter valid input");
+                    break;
+            }
+
+
+
+
+
+            con1.close();
+
+        } catch (ClassNotFoundException e) {
+
+            System.out.println(e);
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+
+
+
+
+    }
+
+
+}
+
+
